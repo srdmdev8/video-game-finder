@@ -8,7 +8,7 @@
 import UIKit
 import CoreData
 
-class WishlistViewController: UIViewController, UITableViewDataSource, NSFetchedResultsControllerDelegate {
+class WishlistViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, NSFetchedResultsControllerDelegate {
     
     var dataController:DataController!
     
@@ -18,11 +18,9 @@ class WishlistViewController: UIViewController, UITableViewDataSource, NSFetched
     
     fileprivate func setUpFetchedResultsController() {
         let fetchRequest:NSFetchRequest<Game> = Game.fetchRequest()
-        let predicate = NSPredicate(format: "category == %@", "wish")
-        fetchRequest.predicate = predicate
         fetchRequest.sortDescriptors = []
         
-        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: "wished game")
+        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: "wished games")
         fetchedResultsController.delegate = self
         do {
             try fetchedResultsController.performFetch()
@@ -37,8 +35,8 @@ class WishlistViewController: UIViewController, UITableViewDataSource, NSFetched
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-
-        dataController = GameSearchViewController.sharedInstance().dataController
+        
+        wishlistTableView.delegate = self
         
         // Fetch data via fetchedResultsController
         setUpFetchedResultsController()
@@ -47,9 +45,6 @@ class WishlistViewController: UIViewController, UITableViewDataSource, NSFetched
             wishlistTableView.deselectRow(at: indexPath, animated: false)
             wishlistTableView.reloadRows(at: [indexPath], with: .fade)
         }
-        
-        // Get games in wishlist
-        getSavedGames()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -57,9 +52,23 @@ class WishlistViewController: UIViewController, UITableViewDataSource, NSFetched
         fetchedResultsController = nil
     }
     
-    // Gather saved wishlist games and display them in the view
-    func getSavedGames() {
-        
+    @IBAction func onSearchGames(_ sender: Any) {
+        performSegue(withIdentifier: "SearchGames", sender: nil)
+    }
+    
+    // Deletes the `Note` at the specified index path
+    func deleteGame(at indexPath: IndexPath) {
+        let gameToDelete = fetchedResultsController.object(at: indexPath)
+        dataController.viewContext.delete(gameToDelete)
+        try? dataController.viewContext.save()
+    }
+    
+    // MARK: Shared Instance
+    class func sharedInstance() -> WishlistViewController {
+        struct Singleton {
+            static var sharedInstance = WishlistViewController()
+        }
+        return Singleton.sharedInstance
     }
     
     // MARK: - Table view data source
@@ -74,29 +83,42 @@ class WishlistViewController: UIViewController, UITableViewDataSource, NSFetched
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let aGame = fetchedResultsController.object(at: indexPath)
-        let cell = wishlistTableView.dequeueReusableCell(withIdentifier: GameCell.defaultReuseIdentifier, for: indexPath) as! GameCell
+        let cell = wishlistTableView.dequeueReusableCell(withIdentifier: "GameCell", for: indexPath) as UITableViewCell?
 
         // Configure cell
-        cell.textLabel?.text = aGame.name
-        
+        cell?.textLabel!.text = aGame.name
         let imageURL = URL(string: aGame.backgroundImage!)
         if let data = try? Data(contentsOf: imageURL!) {
-            cell.gameImageView?.image = UIImage(data: data)
+            cell?.imageView!.image = UIImage(data: data)
         }
 
-        return cell
+        return cell!
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let aGame = fetchedResultsController.object(at: indexPath)
+        
+        performSegue(withIdentifier: "WishlistGameDetails", sender: aGame)
     }
     
     // MARK: - Navigation
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // If this is a NoteDetailsViewController, we'll configure its `Note`
-        // and its delete action
-        if let vc = segue.destination as? GameDetailsViewController {
-            if let indexPath = wishlistTableView.indexPathForSelectedRow {
-                vc.game = fetchedResultsController.object(at: indexPath)
-                vc.dataController = dataController
-                vc.isOnWishlist = true
+        if segue.identifier == "SearchGames" {
+            if let gameSearchVC = segue.destination as? GameSearchViewController {
+                gameSearchVC.dataController = dataController
+            }
+        } else {
+            if let gameDetailsVC = segue.destination as? GameDetailsViewController {
+                gameDetailsVC.game = sender as? Game
+                gameDetailsVC.dataController = dataController
+                gameDetailsVC.isOnWishlist = true
+                
+                gameDetailsVC.onDelete = { [weak self] in
+                    if let indexPath = self?.wishlistTableView.indexPathForSelectedRow {
+                        self?.deleteGame(at: indexPath)
+                    }
+                }
             }
         }
     }

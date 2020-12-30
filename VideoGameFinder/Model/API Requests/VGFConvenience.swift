@@ -57,7 +57,6 @@ extension VGFClient {
                     completionHandlerForGameDetails(nil, error)
                 } else {
                     if let results = results as? [String:AnyObject] {
-                        print(results)
                         let gameDetails = VGFGamesData.VGFGame.gameDetailsFromResults(results)
                         completionHandlerForGameDetails(gameDetails, nil)
                     } else {

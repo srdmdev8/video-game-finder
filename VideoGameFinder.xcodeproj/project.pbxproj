@@ -22,9 +22,6 @@
 		353B77BC2599DEE800A1B92B /* VGFGamesData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 353B77BB2599DEE800A1B92B /* VGFGamesData.swift */; };
 		355FE706259BDA140093E05B /* VGFGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 353B77B82599DECB00A1B92B /* VGFGame.swift */; };
 		359452B9259C3AF70075E996 /* VideoGameFinder.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 359452B7259C3AF70075E996 /* VideoGameFinder.xcdatamodeld */; };
-		35B58DD2259C7AD800E07FC1 /* GameCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35B58DD1259C7AD800E07FC1 /* GameCell.swift */; };
-		35B58DD6259C7C6200E07FC1 /* Cell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35B58DD5259C7C6200E07FC1 /* Cell.swift */; };
-		35B58DDC259CB0A500E07FC1 /* Category+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35B58DDB259CB0A500E07FC1 /* Category+Extensions.swift */; };
 		35B58DE0259CB0B800E07FC1 /* Game+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35B58DDF259CB0B800E07FC1 /* Game+Extensions.swift */; };
 /* End PBXBuildFile section */
 
@@ -46,9 +43,6 @@
 		353B77B82599DECB00A1B92B /* VGFGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VGFGame.swift; sourceTree = "<group>"; };
 		353B77BB2599DEE800A1B92B /* VGFGamesData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VGFGamesData.swift; sourceTree = "<group>"; };
 		359452B8259C3AF70075E996 /* VideoGameFinder.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = VideoGameFinder.xcdatamodel; sourceTree = "<group>"; };
-		35B58DD1259C7AD800E07FC1 /* GameCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCell.swift; sourceTree = "<group>"; };
-		35B58DD5259C7C6200E07FC1 /* Cell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cell.swift; sourceTree = "<group>"; };
-		35B58DDB259CB0A500E07FC1 /* Category+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Category+Extensions.swift"; sourceTree = "<group>"; };
 		35B58DDF259CB0B800E07FC1 /* Game+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Game+Extensions.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -82,8 +76,6 @@
 		353B778225998D6000A1B92B /* VideoGameFinder */ = {
 			isa = PBXGroup;
 			children = (
-				35B58DD4259C7C4E00E07FC1 /* Protocols */,
-				35B58DD0259C7AB400E07FC1 /* Cells */,
 				353B779F2599C90600A1B92B /* Model */,
 				353B779E2599C8DB00A1B92B /* Assets */,
 				353B779C2599C8A200A1B92B /* Storyboards */,
@@ -145,26 +137,9 @@
 			path = "API Requests";
 			sourceTree = "<group>";
 		};
-		35B58DD0259C7AB400E07FC1 /* Cells */ = {
-			isa = PBXGroup;
-			children = (
-				35B58DD1259C7AD800E07FC1 /* GameCell.swift */,
-			);
-			path = Cells;
-			sourceTree = "<group>";
-		};
-		35B58DD4259C7C4E00E07FC1 /* Protocols */ = {
-			isa = PBXGroup;
-			children = (
-				35B58DD5259C7C6200E07FC1 /* Cell.swift */,
-			);
-			path = Protocols;
-			sourceTree = "<group>";
-		};
 		35B58DDA259CB08600E07FC1 /* Managed Object Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				35B58DDB259CB0A500E07FC1 /* Category+Extensions.swift */,
 				35B58DDF259CB0B800E07FC1 /* Game+Extensions.swift */,
 			);
 			path = "Managed Object Extensions";
@@ -240,10 +215,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				35B58DDC259CB0A500E07FC1 /* Category+Extensions.swift in Sources */,
 				353B778825998D6000A1B92B /* GameSearchViewController.swift in Sources */,
 				355FE706259BDA140093E05B /* VGFGame.swift in Sources */,
-				35B58DD6259C7C6200E07FC1 /* Cell.swift in Sources */,
 				353B77A82599CACE00A1B92B /* GameDetailsViewController.swift in Sources */,
 				35B58DE0259CB0B800E07FC1 /* Game+Extensions.swift in Sources */,
 				353B77A22599C98700A1B92B /* WishlistViewController.swift in Sources */,
@@ -255,7 +228,6 @@
 				359452B9259C3AF70075E996 /* VideoGameFinder.xcdatamodeld in Sources */,
 				353B77B12599CC4A00A1B92B /* VGFConvenience.swift in Sources */,
 				353B778625998D6000A1B92B /* SceneDelegate.swift in Sources */,
-				35B58DD2259C7AD800E07FC1 /* GameCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

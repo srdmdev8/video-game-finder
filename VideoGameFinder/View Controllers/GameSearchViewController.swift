@@ -26,23 +26,8 @@ class GameSearchViewController: UIViewController, NSFetchedResultsControllerDele
     
     var dataController: DataController!
     
-    var fetchedResultsController:NSFetchedResultsController<Category>!
-    
     @IBOutlet weak var gameTableView: UITableView!
     @IBOutlet weak var gameSearchBar: UISearchBar!
-    
-    fileprivate func setUpFetchedResultsController() {
-        let fetchRequest:NSFetchRequest<Category> = Category.fetchRequest()
-        fetchRequest.sortDescriptors = []
-        
-        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: "categories")
-        fetchedResultsController.delegate = self
-        do {
-            try fetchedResultsController.performFetch()
-        } catch {
-            fatalError("The fetch could not be performed: \(error.localizedDescription)")
-        }
-    }
 
     override func viewDidLoad() {
         
@@ -57,16 +42,6 @@ class GameSearchViewController: UIViewController, NSFetchedResultsControllerDele
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        // Fetch data via fetchedResultsController
-        setUpFetchedResultsController()
-        
-        // Check if own and wish categories have been created. If not, create them
-        createRequiredCategories()
-    }
-    
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        fetchedResultsController = nil
     }
     
     @objc func handleSingleTap(_ recognizer: UITapGestureRecognizer) {
@@ -84,14 +59,7 @@ class GameSearchViewController: UIViewController, NSFetchedResultsControllerDele
             if let gameDetailsVC = segue.destination as? GameDetailsViewController {
                 gameDetailsVC.gameDetails = gameDetails
                 gameDetailsVC.isGameSearch = true
-                let categories = fetchedResultsController.fetchedObjects!
-                guard let categoryIndex = categories.firstIndex(where: { (category) -> Bool in
-                    category.name == "wish"
-                }) else {
-                    return
-                }
                 gameDetailsVC.dataController = dataController
-                gameDetailsVC.category = categories[categoryIndex]
             }
         }
     }
@@ -110,32 +78,8 @@ class GameSearchViewController: UIViewController, NSFetchedResultsControllerDele
             }
         }
     }
-
-    func createRequiredCategories() {
-        print(fetchedResultsController?.fetchedObjects)
-        guard let categories = fetchedResultsController?.fetchedObjects, !categories.isEmpty else {
-            print("calling addCategory")
-            addCategory("wish")
-            return
-        }
-        for category in categories {
-            print(category.name)
-        }
-    }
-    
-    func addCategory(_ name: String) {
-        print("inside addCategory")
-        let category = Category(context: dataController.viewContext)
-        category.name = name
-        try? dataController.viewContext.save()
-    }
-    
-    // MARK: Shared Instance
-    class func sharedInstance() -> GameSearchViewController {
-        struct Singleton {
-            static var sharedInstance = GameSearchViewController()
-        }
-        return Singleton.sharedInstance
+    @IBAction func onCancel(_ sender: Any) {
+        self.dismiss(animated: true, completion: nil)
     }
 }
 

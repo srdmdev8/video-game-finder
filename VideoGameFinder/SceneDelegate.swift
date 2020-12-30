@@ -18,9 +18,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         guard let _ = (scene as? UIWindowScene) else { return }
         
-        let tabBarViewController = window?.rootViewController as! UITabBarController
-        let gameSearchViewController = tabBarViewController.viewControllers![0] as! GameSearchViewController
-        gameSearchViewController.dataController = (UIApplication.shared.delegate as? AppDelegate)?.dataController
+        let navigationController = window?.rootViewController as! UINavigationController
+        let wishlistViewController = navigationController.topViewController as! WishlistViewController
+        wishlistViewController.dataController = (UIApplication.shared.delegate as? AppDelegate)?.dataController
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {

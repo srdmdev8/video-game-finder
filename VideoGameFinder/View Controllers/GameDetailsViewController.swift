@@ -14,8 +14,6 @@ class GameDetailsViewController: UIViewController, NSFetchedResultsControllerDel
     
     var game: Game!
     
-    var category: Category!
-    
     var isGameSearch: Bool = false
     
     var dataController:DataController!
@@ -23,6 +21,8 @@ class GameDetailsViewController: UIViewController, NSFetchedResultsControllerDel
     var fetchedResultsController:NSFetchedResultsController<Game>!
     
     var isOnWishlist = false
+    
+    var onDelete: (() -> Void)?
     
     @IBOutlet weak var gameImageView: UIImageView!
     @IBOutlet weak var navbarTitle: UINavigationItem!
@@ -36,11 +36,9 @@ class GameDetailsViewController: UIViewController, NSFetchedResultsControllerDel
     
     fileprivate func setUpFetchedResultsController() {
         let fetchRequest:NSFetchRequest<Game> = Game.fetchRequest()
-        let predicate = NSPredicate(format: "category.name == %lf", "wish")
-        fetchRequest.predicate = predicate
         fetchRequest.sortDescriptors = []
         
-        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: "wished game")
+        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: "wished games")
         fetchedResultsController.delegate = self
         do {
             try fetchedResultsController.performFetch()
@@ -51,7 +49,11 @@ class GameDetailsViewController: UIViewController, NSFetchedResultsControllerDel
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        print(category)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
         // Get game name and display in navbar
         navbarTitle.title = isGameSearch ? gameDetails.name : game.name
         
@@ -94,22 +96,25 @@ class GameDetailsViewController: UIViewController, NSFetchedResultsControllerDel
         let shouldAddToWishlist = !isOnWishlist
         if shouldAddToWishlist {
             addGame()
+            self.toggleWishlistButton.image = UIImage(systemName: "text.badge.checkmark")
         } else {
-            let games = fetchedResultsController.fetchedObjects!
-            guard let gameIndex = games.firstIndex(where: { (item) -> Bool in
-                item.name == (isGameSearch ? gameDetails.name : game.name)
-            }) else {
-                return
+            if isGameSearch {
+                var aGame: Game!
+                var gameIndex: IndexPath!
+                let games = fetchedResultsController.fetchedObjects!
+                for game in games {
+                    if game.name == gameDetails.name {
+                        aGame = game
+                    }
+                }
+                gameIndex = fetchedResultsController.indexPath(forObject: aGame)
+                deleteGame(at: gameIndex!)
+            } else {
+                self.onDelete?()
             }
-//            for item in games, index = i {
-//                if item.name == (isGameSearch ? gameDetails.name : game.name) {
-//                    item.index(ofAccessibilityElement: <#T##Any#>)
-//                }
-//            }
-            deleteGame(at: gameIndex as! IndexPath)
+            self.toggleWishlistButton.image = UIImage(systemName: "list.bullet")
         }
         self.isOnWishlist = shouldAddToWishlist
-        self.toggleWishlistButton.image = (shouldAddToWishlist) ? UIImage(systemName: "list.bullet") : UIImage(systemName: "text.badge.checkmark")
     }
     
     @IBAction func onDone(_ sender: Any) {
@@ -155,14 +160,20 @@ class GameDetailsViewController: UIViewController, NSFetchedResultsControllerDel
     
     func checkSavedGames() {
         // Check we have saved games
-        guard let games = fetchedResultsController.fetchedObjects else {
+        guard let games = fetchedResultsController?.fetchedObjects else {
             return
         }
         
         // Loop through games to determine if selected game is on wishlist
         for item in games {
-            if item == game {
-                isOnWishlist = true
+            if isGameSearch {
+                if item.name == gameDetails.name {
+                    isOnWishlist = true
+                }
+            } else {
+                if item == game {
+                    isOnWishlist = true
+                }
             }
         }
         
@@ -182,7 +193,6 @@ class GameDetailsViewController: UIViewController, NSFetchedResultsControllerDel
         aGame.website = isGameSearch ? gameDetails.website : game.website
         aGame.platforms = isGameSearch ? gameDetails.platforms : game.platforms
         aGame.publishers = isGameSearch ? gameDetails.publishers : game.publishers
-        aGame.category = category
         try? dataController.viewContext.save()
     }
 
