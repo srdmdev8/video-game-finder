@@ -51,7 +51,7 @@ class GameDetailsViewController: UIViewController, NSFetchedResultsControllerDel
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        print(category)
         // Get game name and display in navbar
         navbarTitle.title = isGameSearch ? gameDetails.name : game.name
         
@@ -92,6 +92,22 @@ class GameDetailsViewController: UIViewController, NSFetchedResultsControllerDel
     // Add or remove game from Wishlist when the specified button is clicked
     @IBAction func toggleWishList(_ sender: Any) {
         let shouldAddToWishlist = !isOnWishlist
+        if shouldAddToWishlist {
+            addGame()
+        } else {
+            let games = fetchedResultsController.fetchedObjects!
+            guard let gameIndex = games.firstIndex(where: { (item) -> Bool in
+                item.name == (isGameSearch ? gameDetails.name : game.name)
+            }) else {
+                return
+            }
+//            for item in games, index = i {
+//                if item.name == (isGameSearch ? gameDetails.name : game.name) {
+//                    item.index(ofAccessibilityElement: <#T##Any#>)
+//                }
+//            }
+            deleteGame(at: gameIndex as! IndexPath)
+        }
         self.isOnWishlist = shouldAddToWishlist
         self.toggleWishlistButton.image = (shouldAddToWishlist) ? UIImage(systemName: "list.bullet") : UIImage(systemName: "text.badge.checkmark")
     }

@@ -90,6 +90,7 @@ class GameSearchViewController: UIViewController, NSFetchedResultsControllerDele
                 }) else {
                     return
                 }
+                gameDetailsVC.dataController = dataController
                 gameDetailsVC.category = categories[categoryIndex]
             }
         }
@@ -111,13 +112,19 @@ class GameSearchViewController: UIViewController, NSFetchedResultsControllerDele
     }
 
     func createRequiredCategories() {
-        guard (fetchedResultsController?.fetchedObjects) != nil else {
+        print(fetchedResultsController?.fetchedObjects)
+        guard let categories = fetchedResultsController?.fetchedObjects, !categories.isEmpty else {
+            print("calling addCategory")
             addCategory("wish")
             return
+        }
+        for category in categories {
+            print(category.name)
         }
     }
     
     func addCategory(_ name: String) {
+        print("inside addCategory")
         let category = Category(context: dataController.viewContext)
         category.name = name
         try? dataController.viewContext.save()
