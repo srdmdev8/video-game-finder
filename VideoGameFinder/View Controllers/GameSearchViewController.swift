@@ -28,7 +28,8 @@ class GameSearchViewController: UIViewController, NSFetchedResultsControllerDele
     
     @IBOutlet weak var gameTableView: UITableView!
     @IBOutlet weak var gameSearchBar: UISearchBar!
-
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    
     override func viewDidLoad() {
         
         // configure tap recognizer
@@ -48,8 +49,14 @@ class GameSearchViewController: UIViewController, NSFetchedResultsControllerDele
         view.endEditing(true)
     }
     
-    private func displayAlert() {
-        let alert = UIAlertController(title: "Game Search Error", message: "We were unable to gather the game details for the selected game. Please try again in a few moments.", preferredStyle: .alert)
+    private func displayAlert(_ isInputSearch: Bool = false) {
+        var message = ""
+        if isInputSearch {
+            message = "We were unable to gather a list of games for your most recent search."
+        } else {
+            message = "We were unable to gather the game details for the selected game."
+        }
+        let alert = UIAlertController(title: "Game Search Error", message: message + " Please try again in a few moments.", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
         self.present(alert, animated: true)
     }
@@ -98,6 +105,9 @@ extension GameSearchViewController: UISearchBarDelegate {
     // each time the search text changes we want to cancel any current download and start a new one
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         
+        // Start animation when text changes
+        activityIndicator.startAnimating()
+        
         // cancel the last task
         if let task = searchTask {
             task.cancel()
@@ -107,16 +117,30 @@ extension GameSearchViewController: UISearchBarDelegate {
         if searchText == "" {
             games = [[String:AnyObject]]()
             gameTableView?.reloadData()
+            // Stop animation if text was cleared
+            activityIndicator.stopAnimating()
             return
         }
         
         // new search
         searchTask = VGFClient.sharedInstance().getGamesForSearchString(searchText) { (games, error) in
             self.searchTask = nil
+            
+            // Check for error
+            if error != nil {
+                print(error!)
+                self.displayAlert(true)
+                // Stop animation if error occurs
+                self.activityIndicator.stopAnimating()
+                return
+            }
+            
             if let games = games {
                 self.games = games
                 DispatchQueue.main.async {
                     self.gameTableView!.reloadData()
+                    // Stop animation after we reload data
+                    self.activityIndicator.stopAnimating()
                 }
             }
         }
