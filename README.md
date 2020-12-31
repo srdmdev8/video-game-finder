@@ -1,6 +1,14 @@
 iOS Video Game Finder App
 ==============================================================================
 
+Requirements
+------------------------------------------------------------------------------
+To run this application you will need the following:
+
+- Xcode (version 11.0 or greater)
+- iOS device (iOS version 14.2 or greater)
+- Swift (version 5)
+
 Installation and Use
 ------------------------------------------------------------------------------
 - Download the Website's ZIP file [here](https://github.com/srdmdev8/video-game-finder)
